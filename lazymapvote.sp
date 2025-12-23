@@ -6,7 +6,7 @@
 
 #pragma semicolon 1
 #pragma newdecls required
-#define PLUGIN_VERSION     "25w51a"
+#define PLUGIN_VERSION     "25w52a"
 
 #define CHAT_PREFIX        "\x01;[\x07;b064ffLMV\x01;] "
 // for tierd votes
@@ -220,6 +220,12 @@ void OnCvarConfigChange(ConVar convar, const char[] oldValue, const char[] newVa
     configConvarChageLock = true;
     LoadMapCycle(false);
     configConvarChageLock = false;
+}
+
+public void OnServerExitHibernation()
+{
+    OnMapEnd();
+    rtv_state = RTV_NOT_VOTED;
 }
 
 public void OnMapStart()
