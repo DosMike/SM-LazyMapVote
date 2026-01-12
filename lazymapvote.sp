@@ -6,7 +6,7 @@
 
 #pragma semicolon 1
 #pragma newdecls required
-#define PLUGIN_VERSION     "25w52a"
+#define PLUGIN_VERSION     "26w03a"
 
 #define CHAT_PREFIX        "\x01;[\x07;b064ffLMV\x01;] "
 // for tierd votes
@@ -249,7 +249,6 @@ public void OnMapStart()
 public void OnConfigsExecuted()
 {
     LoadMapCycle(true);
-    rtv_state = RTV_NOT_VOTED;
 }
 
 public void OnMapEnd()
@@ -640,6 +639,7 @@ static void LoadMapCycle(bool force)
     LogMessage("[LazyMapVote] Loading mapcycle from '%s'", currentConfig);
 
     OnMapEnd();
+    rtv_state = RTV_NOT_VOTED;
     char key[64];
 
     // destroy existing groups
@@ -883,11 +883,12 @@ Action CommandForceVote(int client, int args)
     }
 
     GetCmdArg(1, buffer, sizeof(buffer));
-    if (rtv_state >= RTV_VOTE_COMPLETE) {
+    if (rtv_state >= RTV_TRANSITION) {
         ReplyToCommand(client, CHAT_PREFIX... "A map vote already concluded");
-    } else if (rtv_state >= RTV_TIER1_RUNNING) {
+    } else if (rtv_state >= RTV_TIER1_RUNNING && rtv_state < RTV_VOTE_COMPLETE) {
         ReplyToCommand(client, CHAT_PREFIX... "A map vote is already in progress");
     } else {
+        rtv_state = RTV_NOT_VOTED;
         TriggerVote(Vote_Forced, when);
     }
     return Plugin_Handled;
